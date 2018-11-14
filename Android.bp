@@ -1,0 +1,119 @@
+cc_library_static {
+    name: "libglob",
+    vendor_available: true,
+
+    cflags: [
+  "-Wall",
+    ],
+
+    srcs: [
+  "glob/glob.c",
+    ],
+
+    local_include_dirs: [
+  "glob",
+    ],
+
+}
+
+cc_library_static {
+    name: "libtraceevent",
+    vendor_available: true,
+
+    cflags: [
+	"-Wall",
+    ],
+
+    srcs: [
+  "lib/traceevent/event-parse.c",
+	"lib/traceevent/event-plugin.c",
+	"lib/traceevent/kbuffer-parse.c",
+	"lib/traceevent/parse-filter.c",
+	"lib/traceevent/parse-utils.c",
+	"lib/traceevent/str_error_r.c",
+	"lib/traceevent/trace-seq.c",
+    ],
+
+    local_include_dirs: [
+	"include/traceevent",
+	"lib/traceevent/include",
+	"tracecmd/include",
+        "include",
+    ],
+
+}
+
+
+cc_library_static {
+    name: "libtracecmd",
+    vendor_available: true,
+
+    cflags: [
+	"-Wall",
+    ],
+
+    srcs: [
+    "lib/trace-cmd/trace-blk-hack.c",
+    "lib/trace-cmd/trace-filter-hash.c",
+    "lib/trace-cmd/trace-ftrace.c",
+    "lib/trace-cmd/trace-hash.c",
+    "lib/trace-cmd/trace-hooks.c",
+    "lib/trace-cmd/trace-input.c",
+    "lib/trace-cmd/trace-recorder.c",
+    "lib/trace-cmd/trace-util.c",
+    ],
+
+    local_include_dirs: [
+	"include/traceevent",
+	"lib/traceevent/include",
+	"include/trace-cmd",
+	"tracecmd/include",
+        "include",
+    ],
+
+}
+
+cc_binary {
+    name: "trace-cmd",
+    cflags: [
+	"-DNO_AUDIT",
+	"-DHAVE_CONFIG_H",
+    ],
+    srcs: [
+          "tracecmd/trace-check-events.c",
+          "tracecmd/trace-cmd.c",
+          "tracecmd/trace-hist.c",
+          "tracecmd/trace-list.c",
+          "tracecmd/trace-listen.c",
+          "tracecmd/trace-mem.c",
+          "tracecmd/trace-msg.c",
+          "tracecmd/trace-output.c",
+          "tracecmd/trace-profile.c",
+          "tracecmd/trace-read.c",
+          "tracecmd/trace-record.c",
+          "tracecmd/trace-restore.c",
+          "tracecmd/trace-show.c",
+          "tracecmd/trace-snapshot.c",
+          "tracecmd/trace-split.c",
+          "tracecmd/trace-stack.c",
+          "tracecmd/trace-stat.c",
+          "tracecmd/trace-stream.c",
+          "tracecmd/trace-usage.c",
+    ],
+    static_libs: [
+        "libglob",
+        "libtracecmd",
+        "libtraceevent",
+    ],
+    system_shared_libs: ["libc", "libdl"],
+    local_include_dirs:[
+	"tracecmd/include",
+	"lib/traceevent/include",
+	"include/trace-cmd",
+	"include/traceevent",
+	"lib/trace-cmd/include",
+	"glob",
+	"include",
+    ],
+}
+

@@ -366,16 +366,15 @@ void trace_util_print_plugin_options(struct trace_seq *s)
 void tracecmd_parse_cmdlines(struct tep_handle *pevent,
 			     char *file, int size __maybe_unused)
 {
-	char *comm;
+	char  comm[512];
 	char *line;
 	char *next = NULL;
 	int pid;
 
 	line = strtok_r(file, "\n", &next);
 	while (line) {
-		sscanf(line, "%d %ms", &pid, &comm);
+		sscanf(line, "%d %s", &pid, comm);
 		tep_register_comm(pevent, comm, pid);
-		free(comm);
 		line = strtok_r(NULL, "\n", &next);
 	}
 }
@@ -383,13 +382,12 @@ void tracecmd_parse_cmdlines(struct tep_handle *pevent,
 static void extract_trace_clock(struct tep_handle *pevent, char *line)
 {
 	char *data;
-	char *clock;
+	char clock[512];
 	char *next = NULL;
 
 	data = strtok_r(line, "[]", &next);
-	sscanf(data, "%ms", &clock);
+	sscanf(data, "%s", clock);
 	tep_register_trace_clock(pevent, clock);
-	free(clock);
 }
 
 void tracecmd_parse_trace_clock(struct tep_handle *pevent,
@@ -411,31 +409,26 @@ void tracecmd_parse_proc_kallsyms(struct tep_handle *pevent,
 			 char *file, unsigned int size __maybe_unused)
 {
 	unsigned long long addr;
-	char *func;
+	char  func[512];
 	char *line;
 	char *next = NULL;
-	char *addr_str;
-	char *mod;
+	char addr_str[512];
+	char mod[512];
 	char ch;
 
 	line = strtok_r(file, "\n", &next);
 	while (line) {
-		mod = NULL;
 		errno = 0;
-		sscanf(line, "%ms %c %ms\t[%ms",
-			     &addr_str, &ch, &func, &mod);
+		sscanf(line, "%s %c %s\t[%s",
+			     addr_str, &ch, func, mod);
 		if (errno) {
-			free(addr_str);
-			free(func);
-			free(mod);
 			perror("sscanf");
 			return;
 		}
 		addr = strtoull(addr_str, NULL, 16);
-		free(addr_str);
 
 		/* truncate the extra ']' */
-		if (mod)
+		if (mod[0] != 0 )
 			mod[strlen(mod) - 1] = 0;
 
 		/*
@@ -445,8 +438,6 @@ void tracecmd_parse_proc_kallsyms(struct tep_handle *pevent,
 		 */
 		if (func[0] != '$' && ch != 'A' && ch != 'a')
 			tep_register_function(pevent, func, addr, mod);
-		free(func);
-		free(mod);
 
 		line = strtok_r(NULL, "\n", &next);
 	}

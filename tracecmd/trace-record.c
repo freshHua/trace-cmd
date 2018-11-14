@@ -4973,6 +4973,7 @@ static void record_trace(int argc, char **argv,
 
 	if (type & (TRACE_TYPE_RECORD | TRACE_TYPE_STREAM)) {
 		signal(SIGINT, finish);
+		signal(SIGTERM, finish);
 		if (!latency)
 			start_threads(type, ctx->global);
 	} else {
